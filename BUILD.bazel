@@ -1,0 +1,18 @@
+platform(
+    name = "windows",
+    constraint_values = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64", # Can also specify CPU
+    ],
+)
+
+cc_binary(
+    name = "my_game",
+    deps = [
+        "@glfw//:glfw",  # <--- This links the library we defined
+    ],
+    linkopts = select({
+        "@platforms//os:windows": [],
+        "//conditions:default": [],
+    }),
+)
