@@ -282,6 +282,8 @@
     "https://bcr.bazel.build/modules/rules_swift/1.18.0/MODULE.bazel": "a6aba73625d0dc64c7b4a1e831549b6e375fbddb9d2dde9d80c9de6ec45b24c9",
     "https://bcr.bazel.build/modules/rules_swift/2.1.1/MODULE.bazel": "494900a80f944fc7aa61500c2073d9729dff0b764f0e89b824eb746959bc1046",
     "https://bcr.bazel.build/modules/rules_swift/2.1.1/source.json": "40fc69dfaac64deddbb75bd99cdac55f4427d9ca0afbe408576a65428427a186",
+    "https://bcr.bazel.build/modules/sqlite3/3.51.1.bcr.1/MODULE.bazel": "323555a0bde4b998127b65b3c7d5b3e31f0df34abbc71829ec6965237c052b91",
+    "https://bcr.bazel.build/modules/sqlite3/3.51.1.bcr.1/source.json": "80dc7903128236f11df64392a1865828bd25bd940e98fdab082c86c81c5c883a",
     "https://bcr.bazel.build/modules/stardoc/0.5.1/MODULE.bazel": "1a05d92974d0c122f5ccf09291442580317cdd859f07a8655f1db9a60374f9f8",
     "https://bcr.bazel.build/modules/stardoc/0.5.3/MODULE.bazel": "c7f6948dae6999bf0db32c1858ae345f112cacf98f174c7a8bb707e41b974f1c",
     "https://bcr.bazel.build/modules/stardoc/0.5.4/MODULE.bazel": "6569966df04610b8520957cb8e97cf2e9faac2c0309657c537ab51c16c18a2a4",
@@ -312,7 +314,7 @@
   "moduleExtensions": {
     "//third_party/build_files:extensions.bzl%non_module_deps": {
       "general": {
-        "bzlTransitiveDigest": "x+N9Acu7tuhEQx6KPXkHCIKrOi3muf7y4nT5VfSOBPo=",
+        "bzlTransitiveDigest": "Nulqy64c3auEVovlAZXneuwbG5r4fO7W5pZNYKwz+94=",
         "usagesDigest": "X9RDEcx4PolddFniKHJYXNzmtrDsxHrers9WmZQNm+Q=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -332,6 +334,14 @@
               "remote": "https://github.com/jarikomppa/soloud.git",
               "commit": "c8e339fdce5c7107bdb3e64bbf707c8fd3449beb",
               "build_file": "@@//third_party/build_files:soloud.bazel"
+            }
+          },
+          "stackwalker": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:git.bzl%git_repository",
+            "attributes": {
+              "remote": "https://github.com/JochenKalmbach/StackWalker.git",
+              "commit": "5b0df7a4db8896f6b6dc45d36e383c52577e3c6b",
+              "build_file": "@@//third_party/build_files:stackwalker.bazel"
             }
           }
         },

@@ -1,0 +1,54 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+# Define config settings for platforms to make selects cleaner
+config_setting(
+    name = "windows",
+    constraint_values = ["@platforms//os:windows"],
+)
+
+cc_library(
+    name = "stackwalker",
+    srcs = select({
+        ":windows": [
+            "Main/StackWalker/StackWalker.cpp",
+        ],
+        "//conditions:default": [],
+    }),
+    hdrs = select({
+        ":windows": [
+            "Main/StackWalker/StackWalker.h",
+        ],
+        "//conditions:default": [],
+    }),
+    # Maps to target_include_directories
+    includes = ["Main/StackWalker"], 
+    defines = select({
+        ":windows": [
+            # Extracted from CMAKE_CXX_FLAGS -D options
+            "_SECURE_SCL=0",
+            "_CRT_SECURE_NO_DEPRECATE",
+            "_CRT_NONSTDC_NO_DEPRECATE",
+            "_SCL_SECURE_NO_DEPRECATE",
+        ],
+        "//conditions:default": [],
+    }),
+    copts = select({
+        ":windows": [
+            # Extracted from CMAKE_CXX_FLAGS compiler options
+            "/W4",       # Warning level 4
+            "/wd4740",   # Disable warning 4740
+            "/Zi",       # Generate debug info
+        ],
+        "//conditions:default": [],
+    }),
+    linkopts = select({
+        ":windows": [
+            # Necessary system libraries for StackWalker on Windows
+            "-DEFAULTLIB:dbghelp.lib",
+            "-DEFAULTLIB:version.lib",
+        ],
+        "//conditions:default": [],
+    }),
+)

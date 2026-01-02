@@ -13,6 +13,7 @@ cc_library(
     deps = [
         # "@glfw//:glfw",  # <--- This links the library we defined
         "@soloud//:soloud",
+        "@stackwalker//:stackwalker",
     ],
     linkopts = select({
         "@platforms//os:windows": [],
