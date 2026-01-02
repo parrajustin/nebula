@@ -73,19 +73,24 @@ cc_library(
     hdrs = glob([
         "include/*.h",
         "src/audiosource/**/*.h",
-    ]) + ["src/audiosource/speech/Elements.def"],
+        "src/audiosource/wav/stb_vorbis.c",
+    ]) + [
+        "src/audiosource/speech/Elements.def",
+    ],
     includes = ["include"],
 
     # --------------------------------------------------------------------------
     # SOURCES
     # --------------------------------------------------------------------------
-    srcs = glob([
-               "src/core/*.cpp",
-               "src/audiosource/**/*.cpp",
-               "src/audiosource/**/*.c",
-               "src/filter/**/*.cpp",
-               "src/c_api/*.cpp",
-           ]) +
+    srcs = glob(
+               [
+                   "src/core/*.cpp",
+                   "src/audiosource/**/*.cpp",
+                   "src/audiosource/**/*.c",
+                   "src/filter/**/*.cpp",
+                   "src/c_api/*.cpp",
+               ]
+           ) +
            # NULL Backend
            select({
                ":backend_null": glob(["src/backend/null/soloud_null.cpp"]),
@@ -165,8 +170,8 @@ cc_library(
     # Linking libraries required by specific backends
     linkopts = select({
         ":windows": [
-            "user32.lib",
-            "ole32.lib",  # Required for COM (WASAPI/XAudio2)
+            # "user32.lib",
+            # "ole32.lib",  # Required for COM (WASAPI/XAudio2)
         ],
         ":linux": [
             "-lpthread",
@@ -199,7 +204,7 @@ cc_library(
 
     # External Dependencies (Repositories)
     deps = select({
-        ":backend_sdl2": ["@sdl2//:sdl2"],  # Assumes external repo @sdl2
+        # ":backend_sdl2": ["@sdl2//:sdl2"],  # Assumes external repo @sdl2
         "//conditions:default": [],
     }),
 )
