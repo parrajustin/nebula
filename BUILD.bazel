@@ -1,3 +1,5 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 platform(
     name = "windows",
     constraint_values = [
@@ -6,10 +8,11 @@ platform(
     ],
 )
 
-cc_binary(
+cc_library(
     name = "my_game",
     deps = [
-        "@glfw//:glfw",  # <--- This links the library we defined
+        # "@glfw//:glfw",  # <--- This links the library we defined
+        "@soloud//:soloud",
     ],
     linkopts = select({
         "@platforms//os:windows": [],

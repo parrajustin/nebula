@@ -1,0 +1,205 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+# ==============================================================================
+# CONFIG SETTINGS
+# ==============================================================================
+# Mapping strictly to the options found in CMakeLists.txt
+
+config_setting(
+    name = "backend_null",
+    define_values = {"SOLOUD_BACKEND_NULL": "ON"},
+)
+
+config_setting(
+    name = "backend_sdl2",
+    define_values = {"SOLOUD_BACKEND_SDL2": "ON"},
+)
+
+config_setting(
+    name = "backend_coreaudio",
+    define_values = {"SOLOUD_BACKEND_COREAUDIO": "ON"},
+)
+
+config_setting(
+    name = "backend_opensles",
+    define_values = {"SOLOUD_BACKEND_OPENSLES": "ON"},
+)
+
+config_setting(
+    name = "backend_xaudio2",
+    define_values = {"SOLOUD_BACKEND_XAUDIO2": "ON"},
+)
+
+config_setting(
+    name = "backend_winmm",
+    define_values = {"SOLOUD_BACKEND_WINMM": "ON"},
+)
+
+config_setting(
+    name = "backend_wasapi",
+    define_values = {"SOLOUD_BACKEND_WASAPI": "ON"},
+)
+
+# --- Platform Helpers ---
+
+config_setting(
+    name = "windows",
+    constraint_values = ["@platforms//os:windows"],
+)
+
+config_setting(
+    name = "linux",
+    constraint_values = ["@platforms//os:linux"],
+)
+
+config_setting(
+    name = "macos",
+    constraint_values = ["@platforms//os:macos"],
+)
+
+config_setting(
+    name = "android",
+    constraint_values = ["@platforms//os:android"],
+)
+
+# ==============================================================================
+# SOLOUD LIBRARY
+# ==============================================================================
+
+cc_library(
+    name = "soloud",
+    hdrs = glob([
+        "include/*.h",
+        "src/audiosource/**/*.h",
+    ]) + ["src/audiosource/speech/Elements.def"],
+    includes = ["include"],
+
+    # --------------------------------------------------------------------------
+    # SOURCES
+    # --------------------------------------------------------------------------
+    srcs = glob([
+               "src/core/*.cpp",
+               "src/audiosource/**/*.cpp",
+               "src/audiosource/**/*.c",
+               "src/filter/**/*.cpp",
+               "src/c_api/*.cpp",
+           ]) +
+           # NULL Backend
+           select({
+               ":backend_null": glob(["src/backend/null/soloud_null.cpp"]),
+               "//conditions:default": [],
+           }) +
+           # SDL2 Backend (Static per CMake logic)
+           select({
+               ":backend_sdl2": glob(["src/backend/sdl2_static/soloud_sdl2_static.cpp"]),
+               "//conditions:default": [],
+           }) +
+           # CoreAudio Backend
+           select({
+               ":backend_coreaudio": glob(["src/backend/coreaudio/soloud_coreaudio.cpp"]),
+               "//conditions:default": [],
+           }) +
+           # OpenSLES Backend
+           select({
+               ":backend_opensles": glob(["src/backend/opensles/soloud_opensles.cpp"]),
+               "//conditions:default": [],
+           }) +
+           # XAudio2 Backend
+           select({
+               ":backend_xaudio2": glob(["src/backend/xaudio2/soloud_xaudio2.cpp"]),
+               "//conditions:default": [],
+           }) +
+           # WINMM Backend
+           select({
+               ":backend_winmm": glob(["src/backend/winmm/soloud_winmm.cpp"]),
+               "//conditions:default": [],
+           }) +
+           # WASAPI Backend
+           select({
+               ":backend_wasapi": glob(["src/backend/wasapi/soloud_wasapi.cpp"]),
+               ":windows": glob(["src/backend/wasapi/soloud_wasapi.cpp"]),
+               "//conditions:default": [],
+           }),
+
+    # --------------------------------------------------------------------------
+    # DEFINES
+    # --------------------------------------------------------------------------
+    defines = [
+                  "SOLOUD_STATIC",  # Matches option SOLOUD_STATIC default ON
+              ] +
+              select({
+                  ":backend_null": ["WITH_NULL"],
+                  "//conditions:default": [],
+              }) +
+              select({
+                  ":backend_sdl2": ["WITH_SDL2_STATIC"],  # Matches CMake add_definitions(-DWITH_SDL2_STATIC)
+                  "//conditions:default": [],
+              }) +
+              select({
+                  ":backend_coreaudio": ["WITH_COREAUDIO"],
+                  "//conditions:default": [],
+              }) +
+              select({
+                  ":backend_opensles": ["WITH_OPENSLES"],
+                  "//conditions:default": [],
+              }) +
+              select({
+                  ":backend_xaudio2": ["WITH_XAUDIO2"],
+                  "//conditions:default": [],
+              }) +
+              select({
+                  ":backend_winmm": ["WITH_WINMM"],
+                  "//conditions:default": [],
+              }) +
+              select({
+                  ":backend_wasapi": ["WITH_WASAPI"],
+                  ":windows": ["WITH_WASAPI"],
+                  "//conditions:default": [],
+              }),
+
+    # --------------------------------------------------------------------------
+    # LINK OPTIONS & DEPS
+    # --------------------------------------------------------------------------
+    # Linking libraries required by specific backends
+    linkopts = select({
+        ":windows": [
+            "user32.lib",
+            "ole32.lib",  # Required for COM (WASAPI/XAudio2)
+        ],
+        ":linux": [
+            "-lpthread",
+            "-ldl",
+        ],
+        ":android": [
+            "-lOpenSLES",  # Required for OpenSLES
+        ],
+        ":macos": [
+            "-framework AudioToolbox",
+            "-framework CoreAudio",
+        ],
+        "//conditions:default": [],
+    }) + select({
+        # Windows libraries (MSVC style .lib)
+        ":backend_xaudio2": ["xaudio2.lib"],
+        "//conditions:default": [],
+    }) + select({
+        ":backend_winmm": ["winmm.lib"],
+        "//conditions:default": [],
+    }) + select({
+        # Mac Frameworks
+        ":backend_coreaudio": ["-framework AudioToolbox", "-framework CoreAudio"],
+        "//conditions:default": [],
+    }) + select({
+        # Android OpenSLES
+        ":backend_opensles": ["-lOpenSLES"],
+        "//conditions:default": [],
+    }),
+
+    # External Dependencies (Repositories)
+    deps = select({
+        ":backend_sdl2": ["@sdl2//:sdl2"],  # Assumes external repo @sdl2
+        "//conditions:default": [],
+    }),
+)
