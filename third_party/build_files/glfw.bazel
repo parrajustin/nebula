@@ -1,5 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
+package(default_visibility = ["//visibility:public"])
+
 # Define config settings for platforms to make selects cleaner
 config_setting(
     name = "windows",
