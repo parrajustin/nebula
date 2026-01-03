@@ -1,5 +1,7 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
+package(default_visibility = ["//visibility:public"])
+
 # config_setting(
 #     name = "windows_build",
 #     constraint_values = [
@@ -31,6 +33,52 @@ platform(
     ],
 )
 
+
+cc_library(
+    name = "stdneb",
+    srcs = [
+        "code/foundation/foundation/stdneb.cc"
+    ],
+    hdrs = [
+        "code/foundation/foundation/stdneb.h",
+        "code/foundation/util/compilerhelper.h",
+        "code/foundation/core/config.h",
+    ] + select({
+        "@platforms//os:windows": [
+            "code/foundation/core/win32/precompiled.h"
+        ],
+        "@platforms//os:macos": [
+            "code/foundation/core/posix/precompiled.h"
+        ],
+        "@platforms//os:linux": [
+            "code/foundation/core/posix/precompiled.h",
+        ],
+        "//conditions:default": [],
+    }),
+    includes = [
+        "code/foundation",
+        "code/addons",
+    ],
+    defines = select({
+        "@platforms//os:windows": [
+            "__WIN32__",
+        ],
+        "//conditions:default": [],
+    }),
+    linkopts = select({
+        "@platforms//os:windows": [
+            # # Windows libs needed.
+            # "user32.lib",
+            # "kernel32.lib",
+        ],
+        ":macos": [
+        ],
+        ":linux": [
+        ],
+        "//conditions:default": [],
+    }),
+)
+
 # cc_library(
 #     name = "my_game",
 #     deps = [
@@ -44,110 +92,126 @@ platform(
 #     }),
 # )
 # The nebula foundation module.
-cc_library(
-    name = "foundation",
-    srcs = [
-        "code/foundation/foundation/stdneb.cc"
-    ] + glob(
-        [
-            "code/foundation/**/*.cc",
-            "code/addons/nflatbuffer/nebula_flat.cc",
-            "code/addons/nflatbuffer/flatbufferinterface.cc",
-        ],
-        exclude = [
-            "code/foundation/foundation/stdneb.cc",
-            "code/foundation/core/posix/**",
-            "code/foundation/fibers/posix/**",
-            "code/foundation/memory/posix/**",
-            "code/foundation/memory/osx/**",
-            "code/foundation/memory/base/**",
-            "code/foundation/util/posix/**",
-            "code/foundation/io/posix/**",
-            "code/foundation/io/osx/**",
-            "code/foundation/timing/posix/**",
-            "code/foundation/timing/darwin/**",
-            "code/foundation/threading/posix/**",
-            "code/foundation/threading/linux/**",
-            "code/foundation/threading/gcc/**",
-            "code/foundation/threading/osx/**",
-            "code/foundation/net/posix/**",
-            "code/foundation/system/posix/**",
-        ]
-    ),
-    hdrs = [
-        "code/foundation/foundation/stdneb.h"
-    ] + glob(
-        [
-            "code/foundation/**/*.h",
-            "code/addons/nflatbuffer/nebula_flat.h",
-            "code/addons/nflatbuffer/flatbufferinterface.h",
-        ],
-        exclude = [
-            "code/foundation/foundation/stdneb.h",
-            "code/foundation/core/posix/**",
-            "code/foundation/fibers/posix/**",
-            "code/foundation/memory/posix/**",
-            "code/foundation/memory/osx/**",
-            "code/foundation/memory/base/**",
-            "code/foundation/util/posix/**",
-            "code/foundation/io/posix/**",
-            "code/foundation/io/osx/**",
-            "code/foundation/timing/posix/**",
-            "code/foundation/timing/darwin/**",
-            "code/foundation/threading/posix/**",
-            "code/foundation/threading/linux/**",
-            "code/foundation/threading/osx/**",
-            "code/foundation/net/posix/**",
-            "code/foundation/system/posix/**",
-        ]
-    ),
-    copts = select({
-        "@platforms//os:windows": [
-            "/FIcode/foundation/foundation/stdneb.h",
-        ],
-        "//conditions:default": [],
-    }),
-    includes = [
-        "code/foundation",
-        "code/addons",
-    ],
-    defines = select({
-        "@platforms//os:windows": [
-            "FIPS_WINDOWS",
-            "HAS_EMBEDDED_EXPORT",
-            "NEBULA_SIMD_X64=1",
-            # Assuming these are defined for windows, might need to be adjusted
-            "WIN32",
-            "_WINDOWS",
-            "__WIN32__",
-            "__X86__",
-            "__WINDOWS__",
-        ],
-        "//conditions:default": [],
-    }),
-    linkopts = select({
-        "@platforms//os:windows": [
-            # Windows libs needed.
-            "user32.lib",
-            "kernel32.lib",
-        ],
-        ":macos": [
-        ],
-        ":linux": [
-        ],
-        "//conditions:default": [],
-    }),
-    deps = [
-        "@stackwalker//:stackwalker",
-        # other fips dependencies need to be added here
-        "@curl//:curl",
-        "@zlib//:zlib",
-        "@tinyxml//:tinyxml",
-        "@flatbuffers//:flatbuffers",
-        "@tinyfiledialogs//:tinyfiledialogs",
-        # "@flatbuffers//:flatbuffers", # nflatbuffer dependency
-    ],
+genrule(
+    name = "gen_math_fbs",
+    srcs = ["syswork/data/flatbuffer/foundation/math.fbs"],
+    outs = ["flat/foundation/math.h"],
+    # We create the dir, generate the file, and then move it to the expected name.
+    cmd = "mkdir -p $(RULEDIR)/flat/foundation && $(location @flatbuffers//:flatc) --cpp --scoped-enums -o $(RULEDIR)/flat/foundation $(SRCS) && mv $(RULEDIR)/flat/foundation/math_generated.h $(RULEDIR)/flat/foundation/math.h",
+    tools = ["@flatbuffers//:flatc"],
 )
+
+# cc_library(
+#     name = "foundation",
+#     srcs = [
+#         "code/foundation/foundation/stdneb.cc"
+#     ] + glob(
+#         [
+#             "code/foundation/**/*.cc",
+#             "code/addons/nflatbuffer/nebula_flat.cc",
+#             "code/addons/nflatbuffer/flatbufferinterface.cc",
+#         ],
+#         exclude = [
+#             "code/foundation/foundation/stdneb.cc",
+#             "code/foundation/core/posix/**",
+#             "code/foundation/fibers/posix/**",
+#             "code/foundation/memory/posix/**",
+#             "code/foundation/memory/osx/**",
+#             "code/foundation/memory/base/**",
+#             "code/foundation/util/posix/**",
+#             "code/foundation/io/posix/**",
+#             "code/foundation/io/osx/**",
+#             "code/foundation/timing/posix/**",
+#             "code/foundation/timing/darwin/**",
+#             "code/foundation/threading/posix/**",
+#             "code/foundation/threading/linux/**",
+#             "code/foundation/threading/gcc/**",
+#             "code/foundation/threading/osx/**",
+#             "code/foundation/net/posix/**",
+#             "code/foundation/system/posix/**",
+#             "code/foundation/io/zipfs/**", # Exclude zipfs due to missing minizip
+#             "code/foundation/io/jsonwriter.cc", # Exclude due to missing pjson.h
+#             "code/foundation/core/debug.cc", # Exclude due to missing debugbreak.h
+#         ]
+#     ),
+#     hdrs = [
+#         "code/foundation/foundation/stdneb.h",
+#         ":gen_math_fbs",
+#     ] + glob(
+#         [
+#             "code/foundation/**/*.h",
+#             "code/addons/nflatbuffer/nebula_flat.h",
+#             "code/addons/nflatbuffer/flatbufferinterface.h",
+#         ],
+#         exclude = [
+#             "code/foundation/foundation/stdneb.h",
+#             "code/foundation/core/posix/**",
+#             "code/foundation/fibers/posix/**",
+#             "code/foundation/memory/posix/**",
+#             "code/foundation/memory/osx/**",
+#             "code/foundation/memory/base/**",
+#             "code/foundation/util/posix/**",
+#             "code/foundation/io/posix/**",
+#             "code/foundation/io/osx/**",
+#             "code/foundation/timing/posix/**",
+#             "code/foundation/timing/darwin/**",
+#             "code/foundation/threading/posix/**",
+#             "code/foundation/threading/linux/**",
+#             "code/foundation/threading/osx/**",
+#             "code/foundation/net/posix/**",
+#             "code/foundation/system/posix/**",
+#             "code/foundation/io/zipfs/**", # Exclude zipfs due to missing minizip
+#         ]
+#     ),
+#     copts = select({
+#         "@platforms//os:windows": [
+#             "/std:c++17",
+#             "/FIcode/foundation/foundation/stdneb.h",
+#             "/FIcode/foundation/core/types.h",
+#         ],
+#         "//conditions:default": [],
+#     }),
+#     includes = [
+#         "code/foundation",
+#         "code/addons",
+#     ],
+#     defines = select({
+#         "@platforms//os:windows": [
+#             "FIPS_WINDOWS",
+#             "HAS_EMBEDDED_EXPORT",
+#             "NEBULA_SIMD_X64=1",
+#             # Assuming these are defined for windows, might need to be adjusted
+#             "WIN32",
+#             "_WINDOWS",
+#             "__WIN32__",
+#             "__X86__",
+#             "__WINDOWS__",
+#         ],
+#         "//conditions:default": [],
+#     }),
+#     linkopts = select({
+#         "@platforms//os:windows": [
+#             # Windows libs needed.
+#             "user32.lib",
+#             "kernel32.lib",
+#         ],
+#         ":macos": [
+#         ],
+#         ":linux": [
+#         ],
+#         "//conditions:default": [],
+#     }),
+#     deps = [
+#         "@stackwalker//:stackwalker",
+#         # other fips dependencies need to be added here
+#         "@curl//:curl",
+#         "@zlib//:zlib",
+#         "@tinyxml//:tinyxml",
+#         "@flatbuffers//:flatbuffers",
+#         "@tinyfiledialogs//:tinyfiledialogs",
+#         # "@flatbuffers//:flatbuffers", # nflatbuffer dependency
+#     ],
+# )
 
 # # The nebula input module.
 # cc_library(

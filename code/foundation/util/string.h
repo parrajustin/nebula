@@ -1190,8 +1190,7 @@ constexpr uint
 String::Hash(const char* c, std::size_t s)
 {
     uint hash = 0;
-    std::size_t i;
-    for (i = 0; i < s; i++)
+    for (std::size_t i = 0; i < s; i++)
     {
         hash += c[i];
         hash += hash << 10;
