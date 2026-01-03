@@ -25,6 +25,12 @@ def _non_module_deps_impl(ctx):
         tag = "2.9.3",
         build_file = "//third_party/build_files:tinyfiledialogs.bazel",
     )
+    git_repository(
+        name = "minizip",
+        remote = "https://github.com/domoticz/minizip.git",
+        commit = "aee7fbddf118d9363575af96310c29fa747d70c0",
+        build_file = "//third_party/build_files:minizip.bazel",
+    )
 
 non_module_deps = module_extension(
     implementation = _non_module_deps_impl,
