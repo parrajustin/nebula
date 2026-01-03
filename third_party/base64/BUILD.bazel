@@ -3,7 +3,8 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "pjson",
-    hdrs = ["pjson.h"],
-    include_prefix = "pjson",
+    name = "base64",
+    hdrs = ["base64.h"],
+    srcs = ["base64.c"],
+    include_prefix = "base64",
 )
