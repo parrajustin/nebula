@@ -35,7 +35,7 @@ voidpf ZCALLBACK nebula3_open_file_func (voidpf opaque, const void* filename64, 
 //------------------------------------------------------------------------------
 /**
 */
-uint32_t ZCALLBACK nebula3_read_file_func (voidpf opaque, voidpf stream, void* buf, uint32_t size)
+unsigned long ZCALLBACK nebula3_read_file_func (voidpf opaque, voidpf stream, void* buf, unsigned long size)
 {
     IO::Stream::Size ret = 0;
     if (NULL != stream)
@@ -44,16 +44,16 @@ uint32_t ZCALLBACK nebula3_read_file_func (voidpf opaque, voidpf stream, void* b
         ret = fileStream->Read(buf, size);
     }
     n_assert(ret < INT_MAX);
-    return (uint32_t)ret;
+    return (unsigned long)ret;
 }
 
 //------------------------------------------------------------------------------
 /**
 */
-uint32_t ZCALLBACK nebula3_write_file_func (voidpf opaque, voidpf stream, const void* buf, uint32_t size)
+unsigned long ZCALLBACK nebula3_write_file_func (voidpf opaque, voidpf stream, const void* buf, unsigned long size)
 {
     n_error("nebula3_write_file_func(): Writing to ZIP archives not supported!");
-    return -1;
+    return (unsigned long)-1;
 }
 
 //------------------------------------------------------------------------------

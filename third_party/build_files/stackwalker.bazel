@@ -23,7 +23,8 @@ cc_library(
         "//conditions:default": [],
     }),
     # Maps to target_include_directories
-    includes = ["Main/StackWalker"], 
+    strip_include_prefix = "Main/StackWalker", 
+    include_prefix = "stackwalker",
     defines = select({
         ":windows": [
             # Extracted from CMAKE_CXX_FLAGS -D options
