@@ -31,7 +31,7 @@
 #define NOPROFILER
 #define NODEFERWINDOWPOS
 #define NOMCX
-#define NOMINMAX
+// #define NOMINMAX
 
 // Windows headers
 #include <windows.h>

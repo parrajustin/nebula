@@ -6,7 +6,7 @@
 
 #include "http/httpnzstream.h"
 #include "http/httpclientregistry.h"
-#include "zlib/zlib.h"
+#include "zlib.h"
 
 namespace Http
 {
