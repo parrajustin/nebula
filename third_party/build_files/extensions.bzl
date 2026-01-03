@@ -19,6 +19,12 @@ def _non_module_deps_impl(ctx):
         commit = "5b0df7a4db8896f6b6dc45d36e383c52577e3c6b",
         build_file = "//third_party/build_files:stackwalker.bazel",
     )
+    git_repository(
+        name = "tinyfiledialogs",
+        remote = "https://github.com/native-toolkit/libtinyfiledialogs.git",
+        tag = "2.9.3",
+        build_file = "//third_party/build_files:tinyfiledialogs.bazel",
+    )
 
 non_module_deps = module_extension(
     implementation = _non_module_deps_impl,

@@ -1,0 +1,8 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "tinyfiledialogs",
+    srcs = ["tinyfiledialogs.c"],
+    hdrs = ["tinyfiledialogs.h"],
+    visibility = ["//visibility:public"],
+)
