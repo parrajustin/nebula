@@ -29,42 +29,41 @@ platform(
     name = "windows",
     constraint_values = [
         "@platforms//os:windows",
-        "@platforms//cpu:x86_64", # Can also specify CPU
+        "@platforms//cpu:x86_64",  # Can also specify CPU
     ],
 )
-
 
 cc_library(
     name = "stdneb",
     srcs = [
-        "code/foundation/foundation/stdneb.cc"
+        "code/foundation/foundation/stdneb.cc",
     ],
     hdrs = [
+        "code/foundation/core/config.h",
         "code/foundation/foundation/stdneb.h",
         "code/foundation/util/compilerhelper.h",
-        "code/foundation/core/config.h",
     ] + select({
         "@platforms//os:windows": [
-            "code/foundation/core/win32/precompiled.h"
+            "code/foundation/core/win32/precompiled.h",
         ],
         "@platforms//os:macos": [
-            "code/foundation/core/posix/precompiled.h"
+            "code/foundation/core/posix/precompiled.h",
         ],
         "@platforms//os:linux": [
             "code/foundation/core/posix/precompiled.h",
         ],
         "//conditions:default": [],
     }),
-    includes = [
-        "code/foundation",
-        "code/addons",
-    ],
     defines = select({
         "@platforms//os:windows": [
             "__WIN32__",
         ],
         "//conditions:default": [],
     }),
+    includes = [
+        "code/addons",
+        "code/foundation",
+    ],
     linkopts = select({
         "@platforms//os:windows": [
             # # Windows libs needed.
@@ -97,121 +96,132 @@ genrule(
     srcs = ["syswork/data/flatbuffer/foundation/math.fbs"],
     outs = ["flat/foundation/math.h"],
     # We create the dir, generate the file, and then move it to the expected name.
-    cmd = "mkdir -p $(RULEDIR)/flat/foundation && $(location @flatbuffers//:flatc) --cpp --scoped-enums -o $(RULEDIR)/flat/foundation $(SRCS) && mv $(RULEDIR)/flat/foundation/math_generated.h $(RULEDIR)/flat/foundation/math.h",
+    cmd = "mkdir -p $(RULEDIR)/flat/foundation && $(location @flatbuffers//:flatc) --cpp --scoped-enums --gen-mutable -o $(RULEDIR)/flat/foundation $(SRCS) && mv $(RULEDIR)/flat/foundation/math_generated.h $(RULEDIR)/flat/foundation/math.h",
     tools = ["@flatbuffers//:flatc"],
 )
 
-# cc_library(
-#     name = "foundation",
-#     srcs = [
-#         "code/foundation/foundation/stdneb.cc"
-#     ] + glob(
-#         [
-#             "code/foundation/**/*.cc",
-#             "code/addons/nflatbuffer/nebula_flat.cc",
-#             "code/addons/nflatbuffer/flatbufferinterface.cc",
-#         ],
-#         exclude = [
-#             "code/foundation/foundation/stdneb.cc",
-#             "code/foundation/core/posix/**",
-#             "code/foundation/fibers/posix/**",
-#             "code/foundation/memory/posix/**",
-#             "code/foundation/memory/osx/**",
-#             "code/foundation/memory/base/**",
-#             "code/foundation/util/posix/**",
-#             "code/foundation/io/posix/**",
-#             "code/foundation/io/osx/**",
-#             "code/foundation/timing/posix/**",
-#             "code/foundation/timing/darwin/**",
-#             "code/foundation/threading/posix/**",
-#             "code/foundation/threading/linux/**",
-#             "code/foundation/threading/gcc/**",
-#             "code/foundation/threading/osx/**",
-#             "code/foundation/net/posix/**",
-#             "code/foundation/system/posix/**",
-#             "code/foundation/io/zipfs/**", # Exclude zipfs due to missing minizip
-#             "code/foundation/io/jsonwriter.cc", # Exclude due to missing pjson.h
-#             "code/foundation/core/debug.cc", # Exclude due to missing debugbreak.h
-#         ]
-#     ),
-#     hdrs = [
-#         "code/foundation/foundation/stdneb.h",
-#         ":gen_math_fbs",
-#     ] + glob(
-#         [
-#             "code/foundation/**/*.h",
-#             "code/addons/nflatbuffer/nebula_flat.h",
-#             "code/addons/nflatbuffer/flatbufferinterface.h",
-#         ],
-#         exclude = [
-#             "code/foundation/foundation/stdneb.h",
-#             "code/foundation/core/posix/**",
-#             "code/foundation/fibers/posix/**",
-#             "code/foundation/memory/posix/**",
-#             "code/foundation/memory/osx/**",
-#             "code/foundation/memory/base/**",
-#             "code/foundation/util/posix/**",
-#             "code/foundation/io/posix/**",
-#             "code/foundation/io/osx/**",
-#             "code/foundation/timing/posix/**",
-#             "code/foundation/timing/darwin/**",
-#             "code/foundation/threading/posix/**",
-#             "code/foundation/threading/linux/**",
-#             "code/foundation/threading/osx/**",
-#             "code/foundation/net/posix/**",
-#             "code/foundation/system/posix/**",
-#             "code/foundation/io/zipfs/**", # Exclude zipfs due to missing minizip
-#         ]
-#     ),
-#     copts = select({
-#         "@platforms//os:windows": [
-#             "/std:c++17",
-#             "/FIcode/foundation/foundation/stdneb.h",
-#             "/FIcode/foundation/core/types.h",
-#         ],
-#         "//conditions:default": [],
-#     }),
-#     includes = [
-#         "code/foundation",
-#         "code/addons",
-#     ],
-#     defines = select({
-#         "@platforms//os:windows": [
-#             "FIPS_WINDOWS",
-#             "HAS_EMBEDDED_EXPORT",
-#             "NEBULA_SIMD_X64=1",
-#             # Assuming these are defined for windows, might need to be adjusted
-#             "WIN32",
-#             "_WINDOWS",
-#             "__WIN32__",
-#             "__X86__",
-#             "__WINDOWS__",
-#         ],
-#         "//conditions:default": [],
-#     }),
-#     linkopts = select({
-#         "@platforms//os:windows": [
-#             # Windows libs needed.
-#             "user32.lib",
-#             "kernel32.lib",
-#         ],
-#         ":macos": [
-#         ],
-#         ":linux": [
-#         ],
-#         "//conditions:default": [],
-#     }),
-#     deps = [
-#         "@stackwalker//:stackwalker",
-#         # other fips dependencies need to be added here
-#         "@curl//:curl",
-#         "@zlib//:zlib",
-#         "@tinyxml//:tinyxml",
-#         "@flatbuffers//:flatbuffers",
-#         "@tinyfiledialogs//:tinyfiledialogs",
-#         # "@flatbuffers//:flatbuffers", # nflatbuffer dependency
-#     ],
-# )
+cc_library(
+    name = "math_flatbuffer",
+    hdrs = [
+        "flat/foundation/math.h",
+    ],
+    deps = [":gen_math_fbs"],
+)
+
+cc_library(
+    name = "foundation",
+    srcs = [
+        "code/addons/nflatbuffer/flatbufferinterface.cc",
+        "code/addons/nflatbuffer/nebula_flat.cc",
+    ] + glob(
+        [
+            "code/foundation/**/*.cc",
+        ],
+        exclude = [
+            "code/foundation/foundation/stdneb.cc",
+            "code/foundation/core/posix/**",
+            "code/foundation/fibers/posix/**",
+            "code/foundation/memory/posix/**",
+            "code/foundation/memory/osx/**",
+            "code/foundation/memory/base/**",
+            "code/foundation/util/posix/**",
+            "code/foundation/util/osx/**",
+            "code/foundation/io/posix/**",
+            "code/foundation/io/osx/**",
+            "code/foundation/timing/posix/**",
+            "code/foundation/timing/darwin/**",
+            "code/foundation/threading/posix/**",
+            "code/foundation/threading/linux/**",
+            "code/foundation/threading/gcc/**",
+            "code/foundation/threading/osx/**",
+            "code/foundation/net/posix/**",
+            "code/foundation/system/posix/**",
+            "code/foundation/system/darwin/**",
+            # "code/foundation/io/jsonwriter.cc", # Exclude due to missing pjson.h
+            "code/foundation/core/debug.cc",  # Exclude due to missing debugbreak.h
+        ],
+    ),
+    hdrs = [
+        "code/addons/nflatbuffer/nebula_flat.h",
+        "code/addons/nflatbuffer/flatbufferinterface.h",
+        # ":gen_math_fbs",
+    ] + glob(
+        [
+            "code/foundation/**/*.h",
+        ],
+        exclude = [
+            "code/foundation/foundation/stdneb.h",
+            "code/foundation/core/posix/**",
+            "code/foundation/fibers/posix/**",
+            "code/foundation/memory/posix/**",
+            "code/foundation/memory/osx/**",
+            "code/foundation/memory/base/**",
+            "code/foundation/util/posix/**",
+            "code/foundation/io/posix/**",
+            "code/foundation/io/osx/**",
+            "code/foundation/timing/posix/**",
+            "code/foundation/timing/darwin/**",
+            "code/foundation/threading/posix/**",
+            "code/foundation/threading/linux/**",
+            "code/foundation/threading/osx/**",
+            "code/foundation/net/posix/**",
+            "code/foundation/system/posix/**",
+        ],
+    ),
+    copts = select({
+        "@platforms//os:windows": [
+            "-DNOMINMAX",
+            "/std:c++17",
+            "/FIcode/foundation/foundation/stdneb.h",
+            "/FIcode/foundation/core/types.h",
+        ],
+        "//conditions:default": [],
+    }),
+    defines = select({
+        "@platforms//os:windows": [
+            "FIPS_WINDOWS",
+            # "HAS_EMBEDDED_EXPORT",
+            "NEBULA_SIMD_X64=1",
+            # Assuming these are defined for windows, might need to be adjusted
+            "WIN32",
+            "_WINDOWS",
+            "__WIN32__",
+            "__X86__",
+            "__WINDOWS__",
+        ],
+        "//conditions:default": [],
+    }),
+    includes = [
+        "code/addons",
+        "code/foundation",
+    ],
+    linkopts = select({
+        "@platforms//os:windows": [
+            # Windows libs needed.
+            "user32.lib",
+            "kernel32.lib",
+        ],
+        ":macos": [
+        ],
+        ":linux": [
+        ],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "@stackwalker",
+        # other fips dependencies need to be added here
+        "@curl",
+        "@zlib",
+        "//code/addons/tinyxml",
+        "@flatbuffers",
+        "@tinyfiledialogs",
+        "@minizip",
+        "//third_party/pjson",
+        "//third_party/base64",
+        ":math_flatbuffer",
+        # "@flatbuffers//:flatbuffers", # nflatbuffer dependency
+    ],
+)
 
 # # The nebula input module.
 # cc_library(

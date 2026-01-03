@@ -31,6 +31,12 @@ def _non_module_deps_impl(ctx):
         commit = "aee7fbddf118d9363575af96310c29fa747d70c0",
         build_file = "//third_party/build_files:minizip.bazel",
     )
+    git_repository(
+        name = "flatbuffers",
+        remote = "https://github.com/google/flatbuffers.git",
+        tag = "v25.9.23",
+        # build_file = "//third_party/build_files:flatbuffers.bazel",
+    )
 
 non_module_deps = module_extension(
     implementation = _non_module_deps_impl,
