@@ -172,7 +172,7 @@
   "moduleExtensions": {
     "//third_party/build_files:extensions.bzl%non_module_deps": {
       "general": {
-        "bzlTransitiveDigest": "ayKzvRlMZndcsRCOu88W9O7mMufYFLDpis/zrlInh6g=",
+        "bzlTransitiveDigest": "6410swtDhMxcLFzhcoYBVmEcgTAdIZs0KrFLWZK347g=",
         "usagesDigest": "X9RDEcx4PolddFniKHJYXNzmtrDsxHrers9WmZQNm+Q=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -222,7 +222,7 @@
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:git.bzl%git_repository",
             "attributes": {
               "remote": "https://github.com/google/flatbuffers.git",
-              "tag": "v25.9.23"
+              "commit": "d0cede9c90c5257537c293517a21376408b549fa"
             }
           }
         },

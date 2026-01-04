@@ -34,7 +34,7 @@ def _non_module_deps_impl(ctx):
     git_repository(
         name = "flatbuffers",
         remote = "https://github.com/google/flatbuffers.git",
-        tag = "v25.9.23",
+        commit = "d0cede9c90c5257537c293517a21376408b549fa",
         # build_file = "//third_party/build_files:flatbuffers.bazel",
     )
 
