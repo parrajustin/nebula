@@ -1,0 +1,4 @@
+[submodule "third_party/rules_cc"]
+	path = third_party/rules_cc
+	url = https://github.com/parrajustin/rules_cc.git
+	branch = "version_0.2.16"
