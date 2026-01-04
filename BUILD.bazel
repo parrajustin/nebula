@@ -173,7 +173,6 @@ cc_library(
         "@platforms//os:windows": [
             "/permissive-",
             "-DNOMINMAX",
-            "/std:c++17",
             "/FIcode/foundation/foundation/stdneb.h",
             "/FIcode/foundation/core/types.h",
         ],
@@ -210,6 +209,7 @@ cc_library(
         "//conditions:default": [],
     }),
     deps = [
+        ":stdneb",
         "@flatbuffers",
         "@flatbuffers//:flatc_library",
         "@stackwalker",
@@ -224,6 +224,20 @@ cc_library(
         "//third_party/debugbreak",
         ":math_flatbuffer",
         # "@flatbuffers//:flatbuffers", # nflatbuffer dependency
+    ],
+)
+
+cc_library(
+    name = "resource",
+    hdrs = glob(["code/resource/**/*.h"]),
+    srcs = glob(["code/resource/**/*.cc"]),
+    includes = [
+        "code/resource",
+        "code/foundation",
+    ],
+    deps = [
+        ":stdneb",
+        ":foundation",
     ],
 )
 
