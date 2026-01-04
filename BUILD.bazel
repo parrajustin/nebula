@@ -121,7 +121,7 @@ cc_library(
             "code/foundation/**/*.cc",
         ],
         exclude = [
-            "code/foundation/foundation/stdneb.cc",
+            "code/foundation/foundation/stdneb.cc", # Included through dep
             "code/foundation/core/posix/**",
             "code/foundation/fibers/posix/**",
             "code/foundation/memory/posix/**",
@@ -140,7 +140,6 @@ cc_library(
             "code/foundation/net/posix/**",
             "code/foundation/system/posix/**",
             "code/foundation/system/darwin/**",
-            "code/foundation/core/debug.cc",  # Exclude due to missing debugbreak.h
         ],
     ),
     hdrs = [
@@ -152,7 +151,7 @@ cc_library(
             "code/foundation/**/*.h",
         ],
         exclude = [
-            "code/foundation/foundation/stdneb.h",
+            "code/foundation/foundation/stdneb.h", # Included through dep
             "code/foundation/core/posix/**",
             "code/foundation/fibers/posix/**",
             "code/foundation/memory/posix/**",
@@ -222,6 +221,7 @@ cc_library(
         "@minizip",
         "//third_party/pjson",
         "//third_party/base64",
+        "//third_party/debugbreak",
         ":math_flatbuffer",
         # "@flatbuffers//:flatbuffers", # nflatbuffer dependency
     ],

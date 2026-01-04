@@ -7,7 +7,7 @@
 #include "core/sysfunc.h"
 #include "io/console.h"
 #include "util/string.h"
-#include "debugbreak.h"
+#include "debugbreak/debugbreak.h"
 
 //------------------------------------------------------------------------------
 /**
