@@ -2,3 +2,6 @@
 	path = third_party/rules_cc
 	url = https://github.com/parrajustin/rules_cc.git
 	branch = "version_0.2.16"
+[submodule "third_party/glew"]
+	path = third_party/glew
+	url = https://github.com/parrajustin/fips-glew.git
